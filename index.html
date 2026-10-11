@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GiruTattoo - Global Tattoo Studio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            glow: '#ffd700',
+                        },
+                        darkbg: '#0a0a0c',
+                        darkcard: '#121216',
+                        darkborder: '#22222a'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        serif: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #e2e8f0;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow-x: hidden;
+        }
+        .cinzel { font-family: 'Cinzel', serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0c; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ca8a04; }
+
+        /* Background Watermark Pattern */
+        .watermark-bg {
+            background-image: radial-gradient(rgba(234, 179, 8, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fff2a3 0%, #eab308 50%, #996515 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border-glow {
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
+        }
+
+        .gold-border-glow:hover {
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.35);
+        }
+    </style>
+</head>
+<body class="watermark-bg min-h-screen flex flex-col justify-between relative selection:bg-amber-500 selection:text-black">
+
+    <!-- Watermark Logo Background (Dynamic) -->
+    <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-5 overflow-hidden">
+        <img id="siteWatermarkImg" src="" alt="GiruTattoo Logo Watermark" class="w-[800px] h-[800px] object-contain filter grayscale border-none shadow-none">
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-black/80 backdrop-blur-md border-b border-zinc-800 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <img id="siteLogoImg" src="" alt="GiruTattoo Logo" class="w-12 h-12 rounded-full border border-gold-500/50 group-hover:scale-105 transition-transform object-cover">
+                <div class="flex flex-col">
+                    <span id="siteBrandTitle" class="cinzel text-xl sm:text-2xl font-bold tracking-widest gold-gradient-text">GIRU TATTOO</span>
+                    <span id="siteBrandSubTitle" class="text-[10px] tracking-widest text-zinc-400 uppercase font-light">Custom Art & Design</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium tracking-wider">
+                <a href="#gallery" class="hover:text-gold-400 transition-colors" data-i18n="nav_gallery">갤러리</a>
+                <a href="#flash" class="hover:text-gold-400 transition-colors" data-i18n="nav_flash">타투 도안 (Flash)</a>
+                <a href="#aftercare" class="hover:text-gold-400 transition-colors" data-i18n="nav_aftercare">관리요령</a>
+                <a href="#notices" class="hover:text-gold-400 transition-colors" data-i18n="nav_notices">공지 & 프로모션</a>
+                <a href="#booking" class="hover:text-gold-400 transition-colors" data-i18n="nav_booking">상담 및 예약</a>
+            </nav>
+
+            <!-- Actions: Language Toggle & Admin Modal Trigger -->
+            <div class="flex items-center gap-3 z-10">
+                <!-- Lang Switcher -->
+                <button id="langToggleBtn" onclick="toggleLanguage()" class="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-900/80 text-xs font-semibold hover:border-gold-500 transition-all flex items-center gap-1.5 text-zinc-200">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-gold-400"></i>
+                    <span id="currentLangText">EN</span>
+                </button>
+
+                <!-- Admin Auth Button -->
+                <button onclick="openAdminModal()" class="p-2 rounded-full border border-zinc-700 bg-zinc-900/80 hover:border-amber-400 text-zinc-400 hover:text-amber-400 transition-all" title="Admin Login">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-zinc-300 hover:text-white">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobileMenu" class="hidden md:hidden bg-zinc-950 border-b border-zinc-800 px-4 pt-2 pb-6 space-y-3 text-center">
+            <a href="#gallery" onclick="toggleMobileMenu()" class="block py-2 text-zinc-300 hover:text-gold-400" data-i18n="nav_gallery">갤러리</a>
+            <a href="#flash" onclick="toggleMobileMenu()" class="block py-2 text-zinc-300 hover:text-gold-400" data-i18n="nav_flash">타투 도안 (Flash)</a>
+            <a href="#aftercare" onclick="toggleMobileMenu()" class="block py-2 text-zinc-300 hover:text-gold-400" data-i18n="nav_aftercare">관리요령</a>
+            <a href="#notices" onclick="toggleMobileMenu()" class="block py-2 text-zinc-300 hover:text-gold-400" data-i18n="nav_notices">공지 & 프로모션</a>
+            <a href="#booking" onclick="toggleMobileMenu()" class="block py-2 text-gold-400 font-bold" data-i18n="nav_booking">상담 및 예약</a>
+        </div>
+    </header>
+
+    <main class="z-10 flex-grow">
+        <!-- Hero Section -->
+        <section class="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-center flex flex-col items-center justify-center min-h-[85vh] border-b border-zinc-900">
+            <div class="absolute inset-0 bg-gradient-to-b from-amber-500/5 via-transparent to-black pointer-events-none"></div>
+            
+            <!-- Logo Emblem in Hero -->
+            <div class="relative mb-6 group">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-600 to-yellow-300 opacity-30 blur-lg group-hover:opacity-70 transition duration-1000"></div>
+                <img id="siteHeroLogoImg" src="" alt="Giru Tattoo Emblem" class="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full border-2 border-gold-500/70 p-1 object-cover bg-black shadow-2xl">
+            </div>
+
+            <h1 id="heroTitle" class="cinzel text-4xl sm:text-6xl font-extrabold tracking-widest mb-4 gold-gradient-text">
+                GIRU TATTOO STUDIO
+            </h1>
+            <p id="heroSubText" class="text-zinc-400 max-w-2xl text-sm sm:text-base mb-8 leading-relaxed font-light" data-i18n="hero_sub">
+                고유한 스토리를 담아내는 프리미엄 커스텀 타투 스튜디오. 섬세한 표현과 정교한 작업으로 당신만의 예술 작품을 완성합니다.
+            </p>
+
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a href="#booking" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-amber-600 to-gold-500 text-black font-bold tracking-wider hover:opacity-90 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span data-i18n="btn_book_now">예약 문의하기</span>
+                </a>
+                <a id="siteKakaoBtn" href="https://open.kakao.com/o/sMe6qXC" target="_blank" rel="noopener noreferrer" class="px-8 py-3.5 rounded-full border border-yellow-500/40 bg-zinc-900/60 hover:bg-zinc-800 text-amber-300 font-semibold tracking-wider transition-all flex items-center gap-2">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    <span data-i18n="btn_kakao">오픈 카카오톡 상담</span>
+                </a>
+            </div>
+
+            <!-- Quick SNS Bar -->
+            <div class="mt-12 flex items-center gap-6 text-zinc-400 text-sm">
+                <a id="siteInstaLink" href="https://instagram.com/giru_tattoo" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 hover:text-gold-400 transition-colors">
+                    <i data-lucide="instagram" class="w-5 h-5 text-pink-500"></i>
+                    <span id="siteInstaText">@giru_tattoo</span>
+                </a>
+                <span class="text-zinc-700">|</span>
+                <span class="text-zinc-400 text-xs flex items-center gap-1">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-gold-400"></i> South Korea / Global Guestwork
+                </span>
+            </div>
+        </section>
+
+        <!-- Works Gallery Section -->
+        <section id="gallery" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+            <div class="text-center mb-12">
+                <h2 class="cinzel text-3xl sm:text-4xl font-bold tracking-wider text-amber-100 mb-2" data-i18n="gallery_title">ARTWORKS GALLERY</h2>
+                <p class="text-zinc-500 text-sm" data-i18n="gallery_sub">카테고리별 최근 시술 작품을 감상하세요</p>
+                <div class="w-16 h-0.5 bg-amber-500/60 mx-auto mt-4"></div>
+            </div>
+
+            <!-- Category Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 text-xs sm:text-sm" id="categoryFilterContainer">
+                <button onclick="filterCategory('all')" class="cat-btn active px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900 hover:border-gold-500 text-zinc-300 transition-all active-cat" data-cat="all" data-i18n="cat_all">전체보기</button>
+                <button onclick="filterCategory('dragon_tiger')" class="cat-btn px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/60 hover:border-gold-500 text-zinc-400 transition-all" data-cat="dragon_tiger" data-i18n="cat_dt">용 · 호랑이</button>
+                <button onclick="filterCategory('flower')" class="cat-btn px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/60 hover:border-gold-500 text-zinc-400 transition-all" data-cat="flower" data-i18n="cat_flower">꽃 · 식물</button>
+                <button onclick="filterCategory('blackgrey')" class="cat-btn px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/60 hover:border-gold-500 text-zinc-400 transition-all" data-cat="blackgrey" data-i18n="cat_bg">블랙 앤 그레이</button>
+                <button onclick="filterCategory('oriental')" class="cat-btn px-4 py-2 rounded-full border border-zinc-800 bg-zinc-900/60 hover:border-gold-500 text-zinc-400 transition-all" data-cat="oriental" data-i18n="cat_oriental">동양화 · 오리엔탈</button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Dynamic Content Rendered via JS -->
+            </div>
+        </section>
+
+        <!-- Tattoo Flash Designs Section (Product Style) -->
+        <section id="flash" class="py-20 bg-zinc-950/60 border-b border-zinc-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-xs uppercase tracking-widest text-amber-500 font-bold">Available Designs</span>
+                    <h2 class="cinzel text-3xl sm:text-4xl font-bold tracking-wider text-amber-100 mt-1 mb-2" data-i18n="flash_title">TATTOO FLASH DESIGNS</h2>
+                    <p class="text-zinc-500 text-sm" data-i18n="flash_sub">예약 가능한 전용 타투 도안들입니다. 마음에 드는 도안을 선택 후 문의해주세요.</p>
+                    <div class="w-16 h-0.5 bg-amber-500/60 mx-auto mt-4"></div>
+                </div>
+
+                <div id="flashGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Dynamic Flash Designs JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tattoo Aftercare & Notices -->
+        <section id="aftercare" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Left: Tattoo Aftercare Guide -->
+                <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 sm:p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-gold-400">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-zinc-100" data-i18n="aftercare_title">타투 시술 및 관리 요령</h3>
+                            <p class="text-xs text-zinc-400">Aftercare & Maintenance Guide</p>
+                        </div>
+                    </div>
+                    
+                    <ul id="aftercareList" class="space-y-4 text-sm text-zinc-300 leading-relaxed">
+                        <!-- Dynamic Aftercare JS -->
+                    </ul>
+                </div>
+
+                <!-- Right: Announcements & Promotions Section -->
+                <div id="notices" class="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-gold-400">
+                                <i data-lucide="megaphone" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-zinc-100" data-i18n="notice_title">공지사항 & 이벤트</h3>
+                                <p class="text-xs text-zinc-400">Notices & Event Pricing</p>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Notices List -->
+                        <div id="noticeList" class="space-y-3">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
+                        <span>* 이벤트 및 할인 가격 문의는 오픈카톡으로 빠른 상담 가능합니다.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Booking & Consultation Form -->
+        <section id="booking" class="py-20 max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-10">
+                <span class="text-xs uppercase tracking-widest text-amber-500 font-bold">Appointment & Inquiry</span>
+                <h2 class="cinzel text-3xl sm:text-4xl font-bold tracking-wider text-amber-100 mt-1 mb-2" data-i18n="book_title">상담 및 예약 신청</h2>
+                <p class="text-zinc-400 text-sm" data-i18n="book_sub">희망하시는 시술 내용과 정보를 적어주시면 확인 후 빠르게 연락드리겠습니다.</p>
+                <div class="w-16 h-0.5 bg-amber-500/60 mx-auto mt-4"></div>
+            </div>
+
+            <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="bg-zinc-900/60 border border-zinc-800 p-6 sm:p-10 rounded-2xl space-y-6 shadow-2xl relative overflow-hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_name">성함 / Name *</label>
+                        <input type="text" id="bookName" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-gold-500 focus:outline-none text-zinc-200" placeholder="홍길동 / John Doe">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_contact">연락처 / Contact (Phone or SNS ID) *</label>
+                        <input type="text" id="bookContact" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-gold-500 focus:outline-none text-zinc-200" placeholder="010-0000-0000 or Instagram ID">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_location">희망 시술 부위 / Tattoo Location *</label>
+                        <input type="text" id="bookLocation" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-gold-500 focus:outline-none text-zinc-200" placeholder="예: 오른쪽 팔뚝, 등 중앙, 발목">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_size">희망 크기 & 예산 / Size & Budget</label>
+                        <input type="text" id="bookSize" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-gold-500 focus:outline-none text-zinc-200" placeholder="예: 10cm x 15cm / 예산 약 30만원">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_date">희망 시술 날짜 / Preferred Date</label>
+                        <input type="date" id="bookDate" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-gold-500 focus:outline-none text-zinc-200 text-zinc-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_ref_image">참고 이미지 파일 / Reference Image</label>
+                        <input type="file" id="bookImage" accept="image/*" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500/20 file:text-gold-400 hover:file:bg-amber-500/30">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-2 uppercase" data-i18n="form_details">상세 시술 내용 및 문의사항 / Details & Message</label>
+                    <textarea id="bookDetails" rows="4" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-gold-500 focus:outline-none text-zinc-200" placeholder="원하시는 스타일, 소재, 문구 등을 자유롭게 적어주세요."></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-600 via-gold-500 to-amber-600 text-black font-extrabold tracking-widest hover:brightness-110 transition-all text-sm uppercase shadow-lg shadow-amber-500/10">
+                    <span data-i18n="form_submit">예약 및 상담 접수하기</span>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Floating Kakao & Insta Direct Action Bar -->
+    <div class="fixed bottom-6 right-6 z-30 flex flex-col gap-3">
+        <a id="floatingKakaoBtn" href="https://open.kakao.com/o/sMe6qXC" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-full bg-yellow-400 text-black shadow-2xl hover:scale-110 transition-transform flex items-center justify-center font-bold" title="오픈 카카오톡 문의">
+            <i data-lucide="message-square" class="w-6 h-6 fill-current"></i>
+        </a>
+        <a id="floatingInstaBtn" href="https://instagram.com/giru_tattoo" target="_blank" rel="noopener noreferrer" class="p-3.5 rounded-full bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 text-white shadow-2xl hover:scale-110 transition-transform flex items-center justify-center" title="인스타그램 연결">
+            <i data-lucide="instagram" class="w-6 h-6"></i>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-zinc-900 py-10 z-10 text-zinc-500 text-xs text-center">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
+            <img id="siteFooterLogoImg" src="" alt="Logo Footer" class="w-10 h-10 rounded-full border border-zinc-800 object-cover">
+            <div class="flex gap-6 font-medium text-zinc-400">
+                <a id="footerInstaLink" href="https://instagram.com/giru_tattoo" target="_blank" class="hover:text-gold-400">Instagram</a>
+                <a id="footerKakaoLink" href="https://open.kakao.com/o/sMe6qXC" target="_blank" class="hover:text-gold-400">Open Kakao Talk</a>
+            </div>
+            <p>© 2026 GiruTattoo. All Rights Reserved. Custom Artwork & Studio Service.</p>
+        </div>
+    </footer>
+
+    <!-- Admin Auth Password Modal -->
+    <div id="adminAuthModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 max-w-sm w-full relative shadow-2xl">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-3 text-gold-400 border border-amber-500/30">
+                    <i data-lucide="lock" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">GiruTattoo 관리자 인증</h3>
+                <p class="text-xs text-zinc-400 mt-1">관리자 전용 비밀번호를 입력하세요.</p>
+            </div>
+
+            <form onsubmit="verifyAdmin(event)" class="space-y-4">
+                <input type="password" id="adminPasswordInput" required placeholder="비밀번호 입력" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-center text-sm focus:border-gold-500 focus:outline-none text-white tracking-widest">
+                <p id="adminAuthError" class="text-red-400 text-xs text-center hidden">비밀번호가 올바르지 않습니다.</p>
+                <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-lg text-sm transition-colors">
+                    로그인
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel Control Modal -->
+    <div id="adminPanelModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden overflow-y-auto p-4 sm:p-6">
+        <div class="max-w-5xl mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 my-8 relative shadow-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <img id="adminHeaderLogo" class="w-10 h-10 rounded-full border border-gold-500 object-cover">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">GiruTattoo Studio Admin Dashboard</h2>
+                        <span class="text-xs text-amber-400">전체 항목 및 콘텐츠 관리자 모드</span>
+                    </div>
+                </div>
+                <button onclick="closeAdminPanel()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-xs flex items-center gap-2">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> 닫기
+                </button>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3 mb-6">
+                <button onclick="switchAdminTab('general')" id="tabBtn-general" class="px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500 text-black">사이트 기본 설정 & 링크</button>
+                <button onclick="switchAdminTab('logo')" id="tabBtn-logo" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400">로고/워터마크 이미지</button>
+                <button onclick="switchAdminTab('gallery')" id="tabBtn-gallery" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400">갤러리 작품 관리</button>
+                <button onclick="switchAdminTab('flash')" id="tabBtn-flash" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400">타투 도안(Flash) 관리</button>
+                <button onclick="switchAdminTab('aftercare')" id="tabBtn-aftercare" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400">관리 요령 관리</button>
+                <button onclick="switchAdminTab('notices')" id="tabBtn-notices" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400">공지 & 행사 관리</button>
+                <button onclick="switchAdminTab('bookings')" id="tabBtn-bookings" class="px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400">접수된 상담/예약 내역</button>
+            </div>
+
+            <!-- Tab Content 0: General Site Settings -->
+            <div id="adminTab-general" class="admin-tab-content">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">기본 정보 및 SNS/카카오톡 링크 수정</h3>
+                <form onsubmit="saveGeneralSettings(event)" class="bg-zinc-950 p-6 rounded-xl border border-zinc-800 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">스튜디오 상호명 (Title)</label>
+                            <input type="text" id="settingTitle" required class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">인스타그램 주소 (Instagram URL)</label>
+                            <input type="url" id="settingInsta" required class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">오픈 카카오톡 주소 (Kakao Open Chat URL)</label>
+                        <input type="url" id="settingKakao" required class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">메인 한글 소개글 (Hero Sub Text KO)</label>
+                            <textarea id="settingHeroKo" rows="3" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">메인 영문 소개글 (Hero Sub Text EN)</label>
+                            <textarea id="settingHeroEn" rows="3" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-600 text-black font-bold text-xs rounded-lg">기본 정보 저장하기</button>
+                </form>
+            </div>
+
+            <!-- Tab Content 1: Logo & Watermark Settings -->
+            <div id="adminTab-logo" class="admin-tab-content hidden">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">사이트 로고 및 워터마크 이미지 변경</h3>
+                <div class="bg-zinc-950 p-6 rounded-xl border border-zinc-800 space-y-6">
+                    <p class="text-xs text-zinc-400 leading-relaxed">업로드하신 이미지는 상단 헤더, 메인 화면 엠블럼, 푸터, 그리고 배경 전체의 투명 워터마크로 일괄 적용됩니다.</p>
+                    
+                    <div class="flex items-center gap-6">
+                        <div>
+                            <span class="text-xs text-zinc-400 block mb-2">현재 적용된 로고/워터마크</span>
+                            <img id="adminCurrentLogoPreview" src="" class="w-24 h-24 rounded-full border border-gold-500 object-cover bg-black">
+                        </div>
+                        <div class="flex-grow space-y-3">
+                            <label class="block text-xs text-zinc-300 font-semibold">새로운 로고/워터마크 그림 파일 선택</label>
+                            <input type="file" id="newLogoFileInput" accept="image/*" class="w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-600">
+                            <button onclick="updateSiteLogo(event)" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-600 text-black font-bold text-xs rounded-lg">로고/워터마크 일괄 적용하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Add Gallery Work -->
+            <div id="adminTab-gallery" class="admin-tab-content hidden">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">새 작품 등록하기</h3>
+                <form onsubmit="addGalleryItem(event)" class="bg-zinc-950 p-4 sm:p-6 rounded-xl border border-zinc-800 space-y-4 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">작품 제목 (한국어/영어)</label>
+                            <input type="text" id="newGalTitle" required placeholder="예: 흑호 레터링 / Black Tiger" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">카테고리</label>
+                            <select id="newGalCat" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                                <option value="dragon_tiger">용 · 호랑이</option>
+                                <option value="flower">꽃 · 식물</option>
+                                <option value="blackgrey">블랙 앤 그레이</option>
+                                <option value="oriental">동양화 · 오리엔탈</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">작품 이미지 첨부 (그림 파일)</label>
+                        <input type="file" id="newGalImage" accept="image/*" required class="w-full text-xs text-zinc-400">
+                    </div>
+                    <button type="submit" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-600 text-black font-bold text-xs rounded-lg">작품 등록</button>
+                </form>
+
+                <h3 class="text-sm font-bold text-zinc-300 mb-3">등록된 갤러리 목록</h3>
+                <div id="adminGalList" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+            </div>
+
+            <!-- Tab Content 3: Add Tattoo Flash -->
+            <div id="adminTab-flash" class="admin-tab-content hidden">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">새 타투 도안 상품 등록</h3>
+                <form onsubmit="addFlashItem(event)" class="bg-zinc-950 p-4 sm:p-6 rounded-xl border border-zinc-800 space-y-4 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">도안 이름</label>
+                            <input type="text" id="newFlashTitle" required placeholder="예: 오리엔탈 뱀과 단풍" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">예상 가격 / 분량</label>
+                            <input type="text" id="newFlashPrice" required placeholder="예: 250,000 KRW / 15cm" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">상태</label>
+                            <select id="newFlashStatus" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                                <option value="Available">예약 가능 (Available)</option>
+                                <option value="Reserved">예약 완료 (Reserved)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">도안 그림파일 업로드</label>
+                        <input type="file" id="newFlashImage" accept="image/*" required class="w-full text-xs text-zinc-400">
+                    </div>
+                    <button type="submit" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-600 text-black font-bold text-xs rounded-lg">도안 등록</button>
+                </form>
+
+                <h3 class="text-sm font-bold text-zinc-300 mb-3">등록된 도안 목록</h3>
+                <div id="adminFlashList" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Tab Content 4: Manage Aftercare Guide -->
+            <div id="adminTab-aftercare" class="admin-tab-content hidden">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">관리 요령 (Aftercare) 수정/추가</h3>
+                <form onsubmit="addAftercareItem(event)" class="bg-zinc-950 p-4 sm:p-6 rounded-xl border border-zinc-800 space-y-4 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">제목 (한국어)</label>
+                            <input type="text" id="newAcTitleKr" required placeholder="예: 금주 및 물 주의" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">제목 (영어 / Optional)</label>
+                            <input type="text" id="newAcTitleEn" placeholder="예: Avoid Alcohol & Water" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">상세 설명 (한국어)</label>
+                            <textarea id="newAcDescKr" rows="2" required placeholder="상세 관리 방법" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">상세 설명 (영어 / Optional)</label>
+                            <textarea id="newAcDescEn" rows="2" placeholder="Description in English" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-600 text-black font-bold text-xs rounded-lg">항목 추가</button>
+                </form>
+
+                <h3 class="text-sm font-bold text-zinc-300 mb-3">현재 게시된 관리 요령 항목</h3>
+                <div id="adminAftercareList" class="space-y-3"></div>
+            </div>
+
+            <!-- Tab Content 5: Notice & Events -->
+            <div id="adminTab-notices" class="admin-tab-content hidden">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">공지사항 / 이벤트 추가</h3>
+                <form onsubmit="addNoticeItem(event)" class="bg-zinc-950 p-4 sm:p-6 rounded-xl border border-zinc-800 space-y-4 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">제목 (한국어)</label>
+                            <input type="text" id="newNoticeTitleKr" required placeholder="예: 여름 시즌 특별 할인 이벤트" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">제목 (영어 / Optional)</label>
+                            <input type="text" id="newNoticeTitleEn" placeholder="예: Summer Special Event 20%" class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">상세 내용</label>
+                        <textarea id="newNoticeContent" rows="3" required placeholder="행사 내용, 기간, 조건 등을 입력하세요." class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-white"></textarea>
+                    </div>
+                    <button type="submit" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-600 text-black font-bold text-xs rounded-lg">공지 추가</button>
+                </form>
+
+                <h3 class="text-sm font-bold text-zinc-300 mb-3">현재 게시된 공지</h3>
+                <div id="adminNoticeList" class="space-y-3"></div>
+            </div>
+
+            <!-- Tab Content 6: Bookings Received -->
+            <div id="adminTab-bookings" class="admin-tab-content hidden">
+                <h3 class="text-sm font-bold text-amber-300 mb-4">고객 문의 및 예약 접수 목록</h3>
+                <div id="adminBookingList" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagePreviewModal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-4" onclick="closeImagePreview()">
+        <div class="relative max-w-3xl w-full flex flex-col items-center">
+            <img id="previewImg" src="" class="max-h-[80vh] w-auto rounded-lg border border-zinc-700 shadow-2xl object-contain">
+            <p id="previewCaption" class="mt-4 text-sm font-semibold text-amber-300"></p>
+            <span class="text-xs text-zinc-500 mt-1">클릭하여 닫기</span>
+        </div>
+    </div>
+
+    <script>
+        const defaultLogo = "https://images.unsplash.com/photo-1542382257-80dedb725088?auto=format&fit=crop&w=400&q=80";
+
+        const defaultGeneral = {
+            title: 'GIRU TATTOO',
+            instaUrl: 'https://instagram.com/giru_tattoo',
+            kakaoUrl: 'https://open.kakao.com/o/sMe6qXC',
+            heroSubKo: '고유한 스토리를 담아내는 프리미엄 커스텀 타투 스튜디오. 섬세한 표현과 정교한 작업으로 당신만의 예술 작품을 완성합니다.',
+            heroSubEn: 'Premium custom tattoo studio crafting unique stories into skin art. Experience refined details and high-end oriental & blackgrey artwork.'
+        };
+
+        const defaultAftercare = [
+            { id: 1, titleKr: '시술 후 랩/랩핑 제거', titleEn: 'Removing Wrap/Film', descKr: '시술 직후 붙여드린 필름은 2~3시간 후 제거하시고, 미온수로 부드럽게 진물을 씻어내 주세요.', descEn: 'Remove protective film after 2-3 hours and gently wash with lukewarm water.' },
+            { id: 2, titleKr: '전용 연고/타투바세린 발라주기', titleEn: 'Applying Tattoo Ointment', descKr: '하루 3~4회 건조하지 않도록 타투 전용 연고 또는 바세린을 얇게 펴 발라줍니다.', descEn: 'Apply thin layer of tattoo ointment 3-4 times a day to prevent skin dryness.' },
+            { id: 3, titleKr: '금주 및 금욕, 물 주의', titleEn: 'Avoid Alcohol & Water', descKr: '시술 후 1~2주일간 음주, 수영장, 사우나, 과도한 운동은 피해주셔야 색이 예쁘게 착색됩니다.', descEn: 'Avoid alcohol, swimming, sauna, and heavy exercise for 1-2 weeks for optimal healing.' },
+            { id: 4, titleKr: '딱지 긁지 않기', titleEn: 'Do Not Scratch Scabs', descKr: '허물이 벗겨지거나 딱지가 생길 때 억지로 떼어내지 마시고 자연스럽게 떨어지도록 두세요.', descEn: 'Let scabs or peeling skin fall off naturally. Do not pick at them.' }
+        ];
+
+        const defaultGallery = [
+            { id: 1, title: 'Black Tiger & Pine Tree', category: 'dragon_tiger', image: 'https://images.unsplash.com/photo-1542382257-80dedb725088?auto=format&fit=crop&w=600&q=80' },
+            { id: 2, title: 'Oriental Dragon Sleeve', category: 'dragon_tiger', image: 'https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?auto=format&fit=crop&w=600&q=80' },
+            { id: 3, title: 'Peony & Snake Blackgrey', category: 'flower', image: 'https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?auto=format&fit=crop&w=600&q=80' },
+            { id: 4, title: 'Lotus Flower Backpiece', category: 'flower', image: 'https://images.unsplash.com/photo-1562962230-16e4623d36e6?auto=format&fit=crop&w=600&q=80' }
+        ];
+
+        const defaultFlash = [
+            { id: 101, title: 'Giru Signature Tiger Flash', price: '300,000 KRW', status: 'Available', image: 'https://images.unsplash.com/photo-1542382257-80dedb725088?auto=format&fit=crop&w=600&q=80' },
+            { id: 102, title: 'Custom Snake & Chrysanthemum', price: '250,000 KRW', status: 'Available', image: 'https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?auto=format&fit=crop&w=600&q=80' }
+        ];
+
+        const defaultNotices = [
+            { id: 201, titleKr: 'GiruTattoo 스튜디오 오픈 프로모션 (전 도안 20% 할인)', titleEn: 'Studio Grand Opening Promo (20% OFF All Flashes)', content: '스튜디오 오픈을 기념하여 첫 방문 고객 및 플래시 도안 시술 시 20% 특별 할인을 진행합니다.' }
+        ];
+
+        // State Data
+        let siteLogo = localStorage.getItem('giru_logo') || defaultLogo;
+        let siteSettings = JSON.parse(localStorage.getItem('giru_settings')) || defaultGeneral;
+        let aftercareData = JSON.parse(localStorage.getItem('giru_aftercare')) || defaultAftercare;
+        let galleryData = JSON.parse(localStorage.getItem('giru_gallery')) || defaultGallery;
+        let flashData = JSON.parse(localStorage.getItem('giru_flash')) || defaultFlash;
+        let noticeData = JSON.parse(localStorage.getItem('giru_notices')) || defaultNotices;
+        let bookingData = JSON.parse(localStorage.getItem('giru_bookings')) || [];
+
+        let currentLang = 'KO';
+        let currentCategory = 'all';
+
+        // i18n Dictionary
+        const i18n = {
+            KO: {
+                nav_gallery: "갤러리",
+                nav_flash: "타투 도안 (Flash)",
+                nav_aftercare: "관리요령",
+                nav_notices: "공지 & 프로모션",
+                nav_booking: "상담 및 예약",
+                btn_book_now: "예약 문의하기",
+                btn_kakao: "오픈 카카오톡 상담",
+                gallery_title: "ARTWORKS GALLERY",
+                gallery_sub: "카테고리별 최근 시술 작품을 감상하세요",
+                cat_all: "전체보기",
+                cat_dt: "용 · 호랑이",
+                cat_flower: "꽃 · 식물",
+                cat_bg: "블랙 앤 그레이",
+                cat_oriental: "동양화 · 오리엔탈",
+                flash_title: "TATTOO FLASH DESIGNS",
+                flash_sub: "예약 가능한 전용 타투 도안들입니다. 마음에 드는 도안을 선택 후 문의해주세요.",
+                aftercare_title: "타투 시술 및 관리 요령",
+                notice_title: "공지사항 & 이벤트",
+                book_title: "상담 및 예약 신청",
+                book_sub: "희망하시는 시술 내용과 정보를 적어주시면 확인 후 빠르게 연락드리겠습니다.",
+                form_name: "성함 / Name *",
+                form_contact: "연락처 / Contact (Phone or SNS ID) *",
+                form_location: "희망 시술 부위 / Tattoo Location *",
+                form_size: "희망 크기 & 예산 / Size & Budget",
+                form_date: "희망 시술 날짜 / Preferred Date",
+                form_ref_image: "참고 이미지 파일 / Reference Image",
+                form_details: "상세 시술 내용 및 문의사항 / Details & Message",
+                form_submit: "예약 및 카카오톡으로 접수하기"
+            },
+            EN: {
+                nav_gallery: "Gallery",
+                nav_flash: "Flash Designs",
+                nav_aftercare: "Aftercare",
+                nav_notices: "Notices & Events",
+                nav_booking: "Booking",
+                btn_book_now: "Book Appointment",
+                btn_kakao: "KakaoTalk Chat",
+                gallery_title: "ARTWORKS GALLERY",
+                gallery_sub: "Explore our recent tattoo projects by category",
+                cat_all: "All Works",
+                cat_dt: "Dragon & Tiger",
+                cat_flower: "Floral & Plants",
+                cat_bg: "Black & Grey",
+                cat_oriental: "Oriental Painting",
+                flash_title: "TATTOO FLASH DESIGNS",
+                flash_sub: "Exclusive available tattoo designs. Select a flash and send us an inquiry.",
+                aftercare_title: "Tattoo Aftercare Guide",
+                notice_title: "Notices & Promotions",
+                book_title: "Consultation & Booking",
+                book_sub: "Fill out the form below with your ideas, and we will get back to you promptly.",
+                form_name: "Full Name *",
+                form_contact: "Contact (Phone / Instagram ID) *",
+                form_location: "Placement / Body Location *",
+                form_size: "Approx. Size & Budget",
+                form_date: "Preferred Date",
+                form_ref_image: "Reference Image File",
+                form_details: "Detailed Description / Ideas",
+                form_submit: "Submit & Send via KakaoTalk"
+            }
+        };
+
+        window.onload = function() {
+            applySiteLogo();
+            applySiteSettings();
+            lucide.createIcons();
+            renderGallery();
+            renderFlash();
+            renderAftercare();
+            renderNotices();
+        };
+
+        function applySiteLogo() {
+            document.getElementById('siteLogoImg').src = siteLogo;
+            document.getElementById('siteHeroLogoImg').src = siteLogo;
+            document.getElementById('siteWatermarkImg').src = siteLogo;
+            document.getElementById('siteFooterLogoImg').src = siteLogo;
+            document.getElementById('adminHeaderLogo').src = siteLogo;
+            document.getElementById('adminCurrentLogoPreview').src = siteLogo;
+        }
+
+        function applySiteSettings() {
+            document.getElementById('siteBrandTitle').innerText = siteSettings.title || 'GIRU TATTOO';
+            document.getElementById('heroTitle').innerText = (siteSettings.title || 'GIRU TATTOO') + ' STUDIO';
+            
+            // Hero Text
+            document.getElementById('heroSubText').innerText = currentLang === 'KO' ? siteSettings.heroSubKo : siteSettings.heroSubEn;
+            
+            // Links
+            document.getElementById('siteKakaoBtn').href = siteSettings.kakaoUrl;
+            document.getElementById('floatingKakaoBtn').href = siteSettings.kakaoUrl;
+            document.getElementById('footerKakaoLink').href = siteSettings.kakaoUrl;
+
+            document.getElementById('siteInstaLink').href = siteSettings.instaUrl;
+            document.getElementById('floatingInstaBtn').href = siteSettings.instaUrl;
+            document.getElementById('footerInstaLink').href = siteSettings.instaUrl;
+
+            // Extract insta ID
+            const match = siteSettings.instaUrl.match(/instagram\.com\/([^/]+)/);
+            if (match && match[1]) {
+                document.getElementById('siteInstaText').innerText = '@' + match[1];
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'KO' ? 'EN' : 'KO';
+            document.getElementById('currentLangText').innerText = currentLang;
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+            applySiteSettings();
+            renderAftercare();
+            renderNotices();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.getAttribute('data-cat') === cat) {
+                    btn.classList.add('border-gold-500', 'text-amber-300', 'bg-zinc-900');
+                    btn.classList.remove('border-zinc-800', 'text-zinc-400');
+                } else {
+                    btn.classList.remove('border-gold-500', 'text-amber-300');
+                    btn.classList.add('border-zinc-800', 'text-zinc-400');
+                }
+            });
+            renderGallery();
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentCategory === 'all' 
+                ? galleryData 
+                : galleryData.filter(item => item.category === currentCategory);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-zinc-500 py-12">등록된 작품이 없습니다.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 cursor-pointer gold-border-glow transition-all";
+                card.onclick = () => openImagePreview(item.image, item.title);
+                card.innerHTML = `
+                    <div class="aspect-square overflow-hidden relative">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute bottom-2 right-2 opacity-30 pointer-events-none">
+                            <img src="${siteLogo}" class="w-8 h-8 rounded-full border border-gold-500 object-cover">
+                        </div>
+                    </div>
+                    <div class="p-4 bg-zinc-950/90 border-t border-zinc-900 flex justify-between items-center">
+                        <span class="text-xs font-semibold text-zinc-200 truncate">${item.title}</span>
+                        <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-gold-400 opacity-60 group-hover:opacity-100"></i>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderFlash() {
+            const grid = document.getElementById('flashGrid');
+            grid.innerHTML = '';
+
+            flashData.forEach(item => {
+                const isAvail = item.status === 'Available';
+                const card = document.createElement('div');
+                card.className = "bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col justify-between group";
+                card.innerHTML = `
+                    <div>
+                        <div class="aspect-square relative overflow-hidden bg-black cursor-pointer" onclick="openImagePreview('${item.image}', '${item.title}')">
+                            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isAvail ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40'}">
+                                ${isAvail ? 'Available' : 'Reserved'}
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-base font-bold text-zinc-100 mb-1">${item.title}</h4>
+                            <p class="text-sm font-semibold text-gold-400">${item.price}</p>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5">
+                        <a href="${siteSettings.kakaoUrl}" target="_blank" class="w-full py-2.5 rounded-lg border border-zinc-700 bg-zinc-950 hover:border-gold-500 text-xs font-bold text-zinc-200 hover:text-gold-400 flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i> 이 도안 문의하기
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderAftercare() {
+            const list = document.getElementById('aftercareList');
+            list.innerHTML = '';
+
+            aftercareData.forEach(item => {
+                const title = currentLang === 'EN' && item.titleEn ? item.titleEn : item.titleKr;
+                const desc = currentLang === 'EN' && item.descEn ? item.descEn : item.descKr;
+                const li = document.createElement('li');
+                li.className = "flex items-start gap-3";
+                li.innerHTML = `
+                    <i data-lucide="check-circle2" class="w-5 h-5 text-gold-500 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="text-amber-200 block">${title}</strong>
+                        <span>${desc}</span>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            lucide.createIcons();
+        }
+
+        function renderNotices() {
+            const list = document.getElementById('noticeList');
+            list.innerHTML = '';
+
+            noticeData.forEach(item => {
+                const title = currentLang === 'EN' && item.titleEn ? item.titleEn : item.titleKr;
+                const div = document.createElement('div');
+                div.className = "p-4 rounded-xl bg-zinc-950/70 border border-zinc-800/80 hover:border-zinc-700 transition-all";
+                div.innerHTML = `
+                    <h4 class="text-sm font-bold text-amber-300 mb-1 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold-500"></span> ${title}
+                    </h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed pl-3.5">${item.content}</p>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openImagePreview(src, title) {
+            document.getElementById('previewImg').src = src;
+            document.getElementById('previewCaption').innerText = title || '';
+            document.getElementById('imagePreviewModal').classList.remove('hidden');
+        }
+        function closeImagePreview() {
+            document.getElementById('imagePreviewModal').classList.add('hidden');
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('bookName').value;
+            const contact = document.getElementById('bookContact').value;
+            const location = document.getElementById('bookLocation').value;
+            const size = document.getElementById('bookSize').value;
+            const date = document.getElementById('bookDate').value;
+            const details = document.getElementById('bookDetails').value;
+            const imgInput = document.getElementById('bookImage');
+
+            const proceedWithBooking = (imgData = '') => {
+                const newBooking = {
+                    id: Date.now(),
+                    name, contact, location, size, date, details,
+                    image: imgData,
+                    createdAt: new Date().toLocaleDateString()
+                };
+
+                bookingData.push(newBooking);
+                localStorage.setItem('giru_bookings', JSON.stringify(bookingData));
+
+                // Format message for KakaoTalk open chat
+                const kakaoMessage = encodeURIComponent(
+                    `[GiruTattoo 예약 및 상담 신청]\n\n` +
+                    `- 성함: ${name}\n` +
+                    `- 연락처/SNS: ${contact}\n` +
+                    `- 희망 시술 부위: ${location}\n` +
+                    `- 희망 크기/예산: ${size || '미기재'}\n` +
+                    `- 희망 날짜: ${date || '미기재'}\n` +
+                    `- 상세 내용: ${details || '없음'}\n` +
+                    `${imgData ? '- 참고 이미지 첨부됨 (관리자 모드에서 확인 가능)' : '- 참고 이미지 없음'}`
+                );
+
+                // Alert user and open KakaoTalk with prefilled context if desired or direct them
+                alert(currentLang === 'KO' ? 
+                    '상담 신청이 웹에 접수되었습니다! 오픈 카카오톡 채팅창이 열리면 복사된 예약 내용을 붙여넣어 주세요.' : 
+                    'Booking submitted! Opening KakaoTalk chat. Please paste your details.'
+                );
+
+                // Open Kakao open chat url
+                window.open(`${siteSettings.kakaoUrl}?text=${kakaoMessage}`, '_blank');
+                document.getElementById('bookingForm').reset();
+            };
+
+            if(imgInput.files && imgInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    proceedWithBooking(evt.target.result);
+                };
+                reader.readAsDataURL(imgInput.files[0]);
+            } else {
+                proceedWithBooking('');
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'KO' ? 'EN' : 'KO';
+            document.getElementById('currentLangText').innerText = currentLang;
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+            applySiteSettings();
+            renderAftercare();
+            renderNotices();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.getAttribute('data-cat') === cat) {
+                    btn.classList.add('border-gold-500', 'text-amber-300', 'bg-zinc-900');
+                    btn.classList.remove('border-zinc-800', 'text-zinc-400');
+                } else {
+                    btn.classList.remove('border-gold-500', 'text-amber-300');
+                    btn.classList.add('border-zinc-800', 'text-zinc-400');
+                }
+            });
+            renderGallery();
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentCategory === 'all' 
+                ? galleryData 
+                : galleryData.filter(item => item.category === currentCategory);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-zinc-500 py-12">등록된 작품이 없습니다.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 cursor-pointer gold-border-glow transition-all";
+                card.onclick = () => openImagePreview(item.image, item.title);
+                card.innerHTML = `
+                    <div class="aspect-square overflow-hidden relative">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute bottom-2 right-2 opacity-30 pointer-events-none">
+                            <img src="${siteLogo}" class="w-8 h-8 rounded-full border border-gold-500 object-cover">
+                        </div>
+                    </div>
+                    <div class="p-4 bg-zinc-950/90 border-t border-zinc-900 flex justify-between items-center">
+                        <span class="text-xs font-semibold text-zinc-200 truncate">${item.title}</span>
+                        <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-gold-400 opacity-60 group-hover:opacity-100"></i>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderFlash() {
+            const grid = document.getElementById('flashGrid');
+            grid.innerHTML = '';
+
+            flashData.forEach(item => {
+                const isAvail = item.status === 'Available';
+                const card = document.createElement('div');
+                card.className = "bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col justify-between group";
+                card.innerHTML = `
+                    <div>
+                        <div class="aspect-square relative overflow-hidden bg-black cursor-pointer" onclick="openImagePreview('${item.image}', '${item.title}')">
+                            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isAvail ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40'}">
+                                ${isAvail ? 'Available' : 'Reserved'}
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-base font-bold text-zinc-100 mb-1">${item.title}</h4>
+                            <p class="text-sm font-semibold text-gold-400">${item.price}</p>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5">
+                        <a href="${siteSettings.kakaoUrl}" target="_blank" class="w-full py-2.5 rounded-lg border border-zinc-700 bg-zinc-950 hover:border-gold-500 text-xs font-bold text-zinc-200 hover:text-gold-400 flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i> 이 도안 문의하기
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderAftercare() {
+            const list = document.getElementById('aftercareList');
+            list.innerHTML = '';
+
+            aftercareData.forEach(item => {
+                const title = currentLang === 'EN' && item.titleEn ? item.titleEn : item.titleKr;
+                const desc = currentLang === 'EN' && item.descEn ? item.descEn : item.descKr;
+                const li = document.createElement('li');
+                li.className = "flex items-start gap-3";
+                li.innerHTML = `
+                    <i data-lucide="check-circle2" class="w-5 h-5 text-gold-500 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="text-amber-200 block">${title}</strong>
+                        <span>${desc}</span>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            lucide.createIcons();
+        }
+
+        function renderNotices() {
+            const list = document.getElementById('noticeList');
+            list.innerHTML = '';
+
+            noticeData.forEach(item => {
+                const title = currentLang === 'EN' && item.titleEn ? item.titleEn : item.titleKr;
+                const div = document.createElement('div');
+                div.className = "p-4 rounded-xl bg-zinc-950/70 border border-zinc-800/80 hover:border-zinc-700 transition-all";
+                div.innerHTML = `
+                    <h4 class="text-sm font-bold text-amber-300 mb-1 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold-500"></span> ${title}
+                    </h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed pl-3.5">${item.content}</p>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openImagePreview(src, title) {
+            document.getElementById('previewImg').src = src;
+            document.getElementById('previewCaption').innerText = title || '';
+            document.getElementById('imagePreviewModal').classList.remove('hidden');
+        }
+        function closeImagePreview() {
+            document.getElementById('imagePreviewModal').classList.add('hidden');
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('bookName').value;
+            const contact = document.getElementById('bookContact').value;
+            const location = document.getElementById('bookLocation').value;
+            const size = document.getElementById('bookSize').value;
+            const date = document.getElementById('bookDate').value;
+            const details = document.getElementById('bookDetails').value;
+            const imgInput = document.getElementById('bookImage');
+
+            const handleProcess = (imgData = '') => {
+                const newBooking = {
+                    id: Date.now(),
+                    name, contact, location, size, date, details,
+                    image: imgData,
+                    createdAt: new Date().toLocaleDateString()
+                };
+
+                bookingData.push(newBooking);
+                localStorage.setItem('giru_bookings', JSON.stringify(bookingData));
+
+                alert(currentLang === 'KO' ? '상담 및 예약 신청이 정상적으로 접수되었습니다. 오픈카카오톡으로 메시지를 남겨주시면 더욱 빠르게 연결됩니다!' : 'Your inquiry has been submitted! For faster response, please reach out via KakaoTalk.');
+                document.getElementById('bookingForm').reset();
+            };
+
+            if(imgInput.files && imgInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    handleProcess(evt.target.result);
+                };
+                reader.readAsDataURL(imgInput.files[0]);
+            } else {
+                handleProcess('');
+            }
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').focus();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+            document.getElementById('adminAuthError').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+        }
+
+        function verifyAdmin(e) {
+            e.preventDefault();
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if(pwd === "1234" || pwd === "1 2 3 4") {
+                closeAdminModal();
+                openAdminPanel();
+            } else {
+                document.getElementById('adminAuthError').classList.remove('hidden');
+            }
+        }
+
+        function openAdminPanel() {
+            document.getElementById('adminPanelModal').classList.remove('hidden');
+            renderAdminLists();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanelModal').classList.add('hidden');
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`adminTab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('[id^="tabBtn-"]').forEach(btn => {
+                btn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-400";
+            });
+            document.getElementById(`tabBtn-${tabName}`).className = "px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500 text-black";
+        }
+
+        function renderAdminLists() {
+            // General settings form populate
+            document.getElementById('settingTitle').value = siteSettings.title;
+            document.getElementById('settingInsta').value = siteSettings.instaUrl;
+            document.getElementById('settingKakao').value = siteSettings.kakaoUrl;
+            document.getElementById('settingHeroKo').value = siteSettings.heroSubKo;
+            document.getElementById('settingHeroEn').value = siteSettings.heroSubEn;
+
+            document.getElementById('adminCurrentLogoPreview').src = siteLogo;
+
+            // Admin Gallery Items
+            const galList = document.getElementById('adminGalList');
+            galList.innerHTML = galleryData.map(item => `
+                <div class="bg-zinc-950 p-2 border border-zinc-800 rounded-lg relative group">
+                    <img src="${item.image}" class="w-full h-24 object-cover rounded mb-2">
+                    <p class="text-[11px] font-bold text-zinc-200 truncate">${item.title}</p>
+                    <button onclick="deleteGalleryItem(${item.id})" class="mt-2 w-full py-1 bg-red-900/60 hover:bg-red-800 text-red-200 text-[10px] rounded">삭제</button>
+                </div>
+            `).join('');
+
+            // Admin Flash Items
+            const flashList = document.getElementById('adminFlashList');
+            flashList.innerHTML = flashData.map(item => `
+                <div class="bg-zinc-950 p-3 border border-zinc-800 rounded-lg flex items-center gap-3">
+                    <img src="${item.image}" class="w-16 h-16 object-cover rounded shrink-0">
+                    <div class="flex-grow overflow-hidden">
+                        <p class="text-xs font-bold text-zinc-200 truncate">${item.title}</p>
+                        <p class="text-[11px] text-amber-400">${item.price}</p>
+                        <span class="text-[10px] text-zinc-500">${item.status}</span>
+                    </div>
+                    <button onclick="deleteFlashItem(${item.id})" class="px-2 py-1 bg-red-900/60 text-red-200 text-[10px] rounded shrink-0">삭제</button>
+                </div>
+            `).join('');
+
+            // Admin Aftercare Items
+            const acList = document.getElementById('adminAftercareList');
+            acList.innerHTML = aftercareData.map(item => `
+                <div class="bg-zinc-950 p-3 border border-zinc-800 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="text-xs font-bold text-amber-300">${item.titleKr} ${item.titleEn ? `(${item.titleEn})` : ''}</p>
+                        <p class="text-[11px] text-zinc-400">${item.descKr}</p>
+                    </div>
+                    <button onclick="deleteAftercareItem(${item.id})" class="px-2.5 py-1 bg-red-900/60 text-red-200 text-[10px] rounded shrink-0">삭제</button>
+                </div>
+            `).join('');
+
+            // Admin Notices
+            const noticeList = document.getElementById('adminNoticeList');
+            noticeList.innerHTML = noticeData.map(item => `
+                <div class="bg-zinc-950 p-3 border border-zinc-800 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="text-xs font-bold text-amber-300">${item.titleKr}</p>
+                        <p class="text-[11px] text-zinc-400">${item.content}</p>
+                    </div>
+                    <button onclick="deleteNoticeItem(${item.id})" class="px-2.5 py-1 bg-red-900/60 text-red-200 text-[10px] rounded shrink-0">삭제</button>
+                </div>
+            `).join('');
+
+            // Admin Bookings
+            const bookingList = document.getElementById('adminBookingList');
+            if(bookingData.length === 0) {
+                bookingList.innerHTML = `<p class="text-xs text-zinc-500">접수된 상담 내역이 없습니다.</p>`;
+            } else {
+                bookingList.innerHTML = bookingData.map((item, idx) => `
+                    <div class="bg-zinc-950 p-4 border border-zinc-800 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                            <span class="text-xs font-bold text-amber-400">#${idx + 1} - ${item.name} (${item.contact})</span>
+                            <span class="text-[10px] text-zinc-500">${item.createdAt}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-zinc-300">
+                            <p><strong>시술 부위:</strong> ${item.location}</p>
+                            <p><strong>희망 크기/예산:</strong> ${item.size || '-'}</p>
+                            <p><strong>희망 날짜:</strong> ${item.date || '-'}</p>
+                        </div>
+                        <p class="text-xs text-zinc-400 bg-zinc-900 p-2 rounded"><strong>내용:</strong> ${item.details || '내용 없음'}</p>
+                        ${item.image ? `<div class="mt-2"><span class="text-[10px] text-zinc-500 block mb-1">첨부된 참고 이미지:</span><img src="${item.image}" class="w-32 h-32 object-cover rounded border border-zinc-800 cursor-pointer" onclick="openImagePreview('${item.image}', '참고 이미지')"></div>` : ''}
+                        <button onclick="deleteBooking(${item.id})" class="mt-2 px-3 py-1 bg-red-900/40 text-red-300 text-[10px] rounded">기록 삭제</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function saveGeneralSettings(e) {
+            e.preventDefault();
+            siteSettings = {
+                title: document.getElementById('settingTitle').value,
+                instaUrl: document.getElementById('settingInsta').value,
+                kakaoUrl: document.getElementById('settingKakao').value,
+                heroSubKo: document.getElementById('settingHeroKo').value,
+                heroSubEn: document.getElementById('settingHeroEn').value
+            };
+            localStorage.setItem('giru_settings', JSON.stringify(siteSettings));
+            applySiteSettings();
+            alert("기본 사이트 정보가 저장되었습니다.");
+        }
+
+        function updateSiteLogo(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('newLogoFileInput');
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    siteLogo = evt.target.result;
+                    localStorage.setItem('giru_logo', siteLogo);
+                    applySiteLogo();
+                    renderGallery();
+                    alert("로고 및 워터마크 이미지가 변경되었습니다!");
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                alert("변경할 이미지 파일을 선택해주세요.");
+            }
+        }
+
+        function addGalleryItem(e) {
+            e.preventDefault();
+            const title = document.getElementById('newGalTitle').value;
+            const category = document.getElementById('newGalCat').value;
+            const fileInput = document.getElementById('newGalImage');
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    galleryData.unshift({
+                        id: Date.now(),
+                        title, category,
+                        image: evt.target.result
+                    });
+                    localStorage.setItem('giru_gallery', JSON.stringify(galleryData));
+                    renderGallery();
+                    renderAdminLists();
+                    e.target.reset();
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function deleteGalleryItem(id) {
+            galleryData = galleryData.filter(i => i.id !== id);
+            localStorage.setItem('giru_gallery', JSON.stringify(galleryData));
+            renderGallery();
+            renderAdminLists();
+        }
+
+        function addFlashItem(e) {
+            e.preventDefault();
+            const title = document.getElementById('newFlashTitle').value;
+            const price = document.getElementById('newFlashPrice').value;
+            const status = document.getElementById('newFlashStatus').value;
+            const fileInput = document.getElementById('newFlashImage');
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    flashData.unshift({
+                        id: Date.now(),
+                        title, price, status,
+                        image: evt.target.result
+                    });
+                    localStorage.setItem('giru_flash', JSON.stringify(flashData));
+                    renderFlash();
+                    renderAdminLists();
+                    e.target.reset();
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function deleteFlashItem(id) {
+            flashData = flashData.filter(i => i.id !== id);
+            localStorage.setItem('giru_flash', JSON.stringify(flashData));
+            renderFlash();
+            renderAdminLists();
+        }
+
+        function addAftercareItem(e) {
+            e.preventDefault();
+            const titleKr = document.getElementById('newAcTitleKr').value;
+            const titleEn = document.getElementById('newAcTitleEn').value;
+            const descKr = document.getElementById('newAcDescKr').value;
+            const descEn = document.getElementById('newAcDescEn').value;
+
+            aftercareData.unshift({
+                id: Date.now(),
+                titleKr, titleEn, descKr, descEn
+            });
+            localStorage.setItem('giru_aftercare', JSON.stringify(aftercareData));
+            renderAftercare();
+            renderAdminLists();
+            e.target.reset();
+        }
+
+        function deleteAftercareItem(id) {
+            aftercareData = aftercareData.filter(i => i.id !== id);
+            localStorage.setItem('giru_aftercare', JSON.stringify(aftercareData));
+            renderAftercare();
+            renderAdminLists();
+        }
+
+        function addNoticeItem(e) {
+            e.preventDefault();
+            const titleKr = document.getElementById('newNoticeTitleKr').value;
+            const titleEn = document.getElementById('newNoticeTitleEn').value;
+            const content = document.getElementById('newNoticeContent').value;
+
+            noticeData.unshift({
+                id: Date.now(),
+                titleKr, titleEn, content
+            });
+            localStorage.setItem('giru_notices', JSON.stringify(noticeData));
+            renderNotices();
+            renderAdminLists();
+            e.target.reset();
+        }
+
+        function deleteNoticeItem(id) {
+            noticeData = noticeData.filter(i => i.id !== id);
+            localStorage.setItem('giru_notices', JSON.stringify(noticeData));
+            renderNotices();
+            renderAdminLists();
+        }
+
+        function deleteBooking(id) {
+            bookingData = bookingData.filter(i => i.id !== id);
+            localStorage.setItem('giru_bookings', JSON.stringify(bookingData));
+            renderAdminLists();
+        }
+    </script>
+</body>
+</html>
